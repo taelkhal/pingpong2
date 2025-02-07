@@ -67,7 +67,8 @@ class callback_42(APIView):
                 refresh = RefreshToken.for_user(user)
                 access_token = str(refresh.access_token)
             save_to_json(user_data)
-            redirect_url = f"http://127.0.0.1:5500/dashboard.html&access_token={access_token}"
+            # redirect_url = f"http://127.0.0.1:5500/dashboard.html&access_token={access_token}"
+            redirect_url = f"http://127.0.0.1:5500/sign-in-page.html?access_token={access_token}"
             return redirect(redirect_url)
         else:
             return redirect("http://127.0.0.1:8000/?error")

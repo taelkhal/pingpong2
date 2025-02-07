@@ -172,6 +172,11 @@ body
     width: 3vw;
     padding-right: 0.5vw;
 }
+
+.error-msg
+{
+    margin: 0 0 0 1vw;
+}
 @media (max-height : 700px)
 {
     .border-up
@@ -230,6 +235,11 @@ body
 }
 @media (max-height : 1080px)
 {
+    .border-up
+    {
+
+        margin-top: 100px;
+    }
     .border-up,
     .border-bottom
     {
@@ -326,6 +336,7 @@ body
     {
         width: 50vw;
         height: 35vh;
+        /* margin-top: 100px; */
     }
 
     .border-up h2 
@@ -381,8 +392,9 @@ body
 
     .border-up,
     .border-bottom {
+
         /* width: 70%; */
-        /* margin-top: 5vh; */
+        /* margin-top: 100px; */
         /* height: 220px; */
         
     }

@@ -251,56 +251,131 @@
 //         alert('An error occurred. Please try again.');  // General error message
 //     }
 // });
-document.getElementById('signup-form').addEventListener('submit', async (event) => {
-    event.preventDefault(); // Prevent the form from reloading the page
-
-    const username = document.getElementById('username').value;
-    const first_name = document.getElementById('first_name').value;
-    const last_name = document.getElementById('last_name').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    // Prepare data as form-encoded
-    const formData = new URLSearchParams();
-    formData.append('username', username);
-    formData.append('first_name', first_name);
-    formData.append('last_name', last_name);
-    formData.append('email', email);
-    formData.append('password', password);
-
-    try {
-        const response = await fetch('http://127.0.0.1:8000/register/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',  // Use form URL encoded
-            },
-            body: formData.toString(),  // Send form-encoded data
+        document.getElementById('signup-form').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent the form from reloading the page
+        
+            const username = document.getElementById('username').value;
+            const first_name = document.getElementById('first_name').value;
+            const last_name = document.getElementById('last_name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+        
+            // Prepare data as form-encoded
+            const formData = new URLSearchParams();
+            formData.append('username', username);
+            formData.append('first_name', first_name);
+            formData.append('last_name', last_name);
+            formData.append('email', email);
+            formData.append('password', password);
+        
+            try {
+                const response = await fetch('http://127.0.0.1:8000/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',  // Use form URL encoded
+                    },
+                    body: formData.toString(),  // Send form-encoded data
+                });
+            
+                if (response.ok)
+                {
+                    const data = await response.json();
+                    // alert(data.message);  // Show success message from backend
+                    window.location.href = '/sign-in-page.html';  // Redirect
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.error || 'Sign-up failed');  // Show error message from backend
+                }
+            } catch (error) {
+                console.error('Error during sign-up:', error);
+                alert('An error occurred. Please try again.');  // General error message
+            }
         });
 
-        if (response.ok) {
-            const data = await response.json();
-            alert(data.message);  // Show success message from backend
-            window.location.href = 'sign-in-page.html';  // Redirect
-        } else {
-            const errorData = await response.json();
-            alert(errorData.error || 'Sign-up failed');  // Show error message from backend
-        }
-    } catch (error) {
-        console.error('Error during sign-up:', error);
-        alert('An error occurred. Please try again.');  // General error message
-    }
-});
+        // Pre-fill the form with data from the backend (if provided) and log it
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+        
+            const username = params.get('username');
+            const firstName = params.get('first_name');
+            const lastName = params.get('last_name');
+            const email = params.get('email');
+        
+            // Only log data and pre-fill the form if query parameters exist
+            // if (username || firstName || lastName || email) {
+            //     console.log('Received data from backend:');
+            //     console.log('Username:', username || 'Not provided');
+            //     console.log('First Name:', firstName || 'Not provided');
+            //     console.log('Last Name:', lastName || 'Not provided');
+            //     console.log('Email:', email || 'Not provided');
+            
+            //     if (username) document.getElementById('username').value = username;
+            //     if (firstName) document.getElementById('first_name').value = firstName;
+            //     if (lastName) document.getElementById('last_name').value = lastName;
+            //     if (email) document.getElementById('email').value = email;
+            // } else {
+            //     console.log('No query parameters detected. Awaiting 42 Network login.');
+            // }
+        });
+
+        // Handle 42 Network sign-up
+        document.querySelector('.btn2').addEventListener('click', async () => {
+            try {
+                // Redirect the user to the 42 login endpoint
+                window.location.href = 'http://127.0.0.1:8000/42_login/';
+                const params = new URLSearchParams(window.location.search);
+        
+                const username = params.get('login');
+                const firstName = params.get('first_name');
+                const lastName = params.get('last_name');
+                const email = params.get('email');
+
+                console.log('Received data from backend:');
+                console.log('login:', username || 'Not provided');
+                console.log('First Name:', firstName || 'Not provided');
+                console.log('Last Name:', lastName || 'Not provided');
+                console.log('Email:', email || 'Not provided');
+            } catch (error) {
+                console.error('Error during 42 Network login:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+
+// Handle 42 Network sign-up
 
 // Add functionality for the 42 Network button
-document.querySelector('.btn2').addEventListener('click', async () => {
-    try {
-        // Redirect the user to the 42 login endpoint
-        window.location.href = 'http://127.0.0.1:5500/sign-in-page.html';
-    } catch (error) {
-        console.error('Error during 42 Network login:', error);
-        alert('An error occurred. Please try again.');
-    }
-});
+// document.querySelector('.btn2').addEventListener('click', async () => {
+//     try {
+//         // Redirect the user to the 42 login endpoint
+//         window.location.href = 'http://127.0.0.1:5500/sign-in-page.html';
+//     } catch (error) {
+//         console.error('Error during 42 Network login:', error);
+//         alert('An error occurred. Please try again.');
+//     }
+// });
+
+
+// // Pre-fill the form with data from the backend (if provided) and log it
+// document.addEventListener('DOMContentLoaded', () => {
+//     const params = new URLSearchParams(window.location.search);
+
+//     const username = params.get('username');
+//     const firstName = params.get('first_name');
+//     const lastName = params.get('last_name');
+//     const email = params.get('email');
+
+//     if (username) document.getElementById('username').value = username;
+//     if (firstName) document.getElementById('first_name').value = firstName;
+//     if (lastName) document.getElementById('last_name').value = lastName;
+//     if (email) document.getElementById('email').value = email;
+
+//     console.log('Received data from backend:');
+//     console.log('Username:', username || 'Not provided');
+//     console.log('First Name:', firstName || 'Not provided');
+//     console.log('Last Name:', lastName || 'Not provided');
+//     console.log('Email:', email || 'Not provided');
+
+// });
 
 
 </script>
