@@ -233,8 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `,
         profile: `
             <div class="profile">
-                <h2>Your Profile</h2>
-                <p>Manage your profile information here.</p>
+            
             </div>
         `,
         game: `

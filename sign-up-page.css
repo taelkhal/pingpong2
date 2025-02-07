@@ -136,7 +136,7 @@ body
     padding-top: 1.2vh;
     font-weight: bold;
     font-size: 1vw;
-    margin: 1vh 0 0 7vw;
+    margin: 0.5vh 0 0 0;
     display: flex;
     justify-content: center;
 }
@@ -240,7 +240,8 @@ body
         /* width: 70%;
         height: 38%; */
         width: 40vw;
-        height: 35vh;
+        /* height: 35vh; */
+        height: 350px;
     }
 
     .border-up h2
@@ -253,7 +254,7 @@ body
     }
     .border-up p 
     {
-        font-size: 0.7vw;
+        font-size: 0.5vw;
         line-height: 1.7vh;
         width: 60%;
     }
@@ -261,6 +262,7 @@ body
     .btn 
     {
         width: 10vw;
+        height: 5vh;
         font-size: 0.8vw;
         margin-left: 14vw;
     }
@@ -272,15 +274,19 @@ body
     }
     .btn2
     {
+        height: 5vh;
         width: 10vw;
         font-size: 0.8vw;
-
-        margin-left: 14vw;
+        margin-left: -40px;
     }
 }
 
 @media (max-width: 1920px) 
 {
+    .border-up
+    {
+        margin-top: 120px;
+    }
     .border-up,
     .border-bottom 
     {
@@ -295,7 +301,7 @@ body
 
     .border-up p 
     {
-        font-size: 1.2vw;
+        font-size: 0.8vw;
         line-height: 3vh;
         width: 60%;
     }
@@ -303,6 +309,7 @@ body
     .btn 
     {
         width: 12vw;
+        height: 5vh;
         font-size: 1vw;
         margin-left: 11vw;
     }
@@ -319,8 +326,9 @@ body
     {
         width: 12vw;
         font-size: 1vw;
-        margin-left: 13vw;
-        margin-left: 11vw;
+        margin-left: -1vw;
+        height: 4.5vh;
+        /* margin-left: 11vw; */
     }
 }
 @media (max-width: 1400px) 
@@ -379,11 +387,11 @@ body
 
 @media (max-width: 768px) 
 {
-    .main {
+    .main
+    {
         flex-direction: column;
         padding: 0 5vw; 
     }
-
     .border-up
     {
         margin-top: 100px;
@@ -438,6 +446,7 @@ body
     .border-bottom 
     {
         width: 90%;
+        /* height: 180px; */
         /* height: auto; */
         /* margin-top: 3vh; */
     }
@@ -449,8 +458,11 @@ body
 
     .border-up p 
     {
-        font-size: 2.5vw;
-        width: 50%; 
+        font-size: 2vw;
+        padding-bottom: 20px;
+        /* padding: 10px 0 15px 0; */
+        line-height: 10px;
+        /* width: 50%;  */
     }
 
     .btn 
@@ -477,6 +489,6 @@ body
         width: 35%;
         font-size: 2vw; 
         padding: 1.5vh 0;
-        margin-left: 32.5%;
+        margin-left: 0;
     }
 }

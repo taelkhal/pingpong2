@@ -318,9 +318,9 @@ body
 {
     .header a
     {
-        font-size: 12px;
+        font-size: 10px;
         font-weight: bold;
-        padding: 3px 15px;
+        padding: 2px 15px;
     }
     .test
     {
