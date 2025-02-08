@@ -41,6 +41,8 @@ body
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 10px 20px; /* Add some padding inside the header */
+    box-sizing: border-box; /* Ensure padding doesn't affect layout width */
 }
 
 .header a {

@@ -232,15 +232,32 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         `,
         profile: `
-            <div class="profile">
-            
+            <link rel="stylesheet" href="profile.css">
+            <div class="profile-container">
+              <div class="profile-info">
+                <img class="profile-border" src="profile imgs/main_profile_window.png" alt="Profile Info">
+              </div>
+              <div class="profile-stats">
+                <img class="stats-border wins" src="profile imgs/level_and_wins_window.png" alt="Wins">
+                <img class="stats-border level" src="profile imgs/level_and_wins_window.png" alt="Level">
+              </div>
+              <div class="match-history">
+                <img class="match-history-border" src="profile imgs/match_history_window.png" alt="Match History">
+              </div>
             </div>
         `,
         game: `
-            <div class="game">
-                <h2>Game Page</h2>
-                <p>Play exciting games here!</p>
+            <div class="play_local">
+                <div class="btn">
+                    <button type="button" onclick="location.href='game.html';">Play Local Game</button>
+                </div>
+                <img class="f_img" src="dashboard img/full_button.png">
             </div>
+            <div class="btn2">
+                <button type="button" onclick="location.href='game.html';">Play Online Game</button>
+            </div>
+            <img class="f_img" src="dashboard img/full_buton_2.png">
+            <div>
         `,
         tournament: `
             <div class="tournament">
