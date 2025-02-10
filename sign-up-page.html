@@ -324,17 +324,28 @@
                 // Redirect the user to the 42 login endpoint
                 window.location.href = 'http://127.0.0.1:8000/42_login/';
                 const params = new URLSearchParams(window.location.search);
-        
-                const username = params.get('login');
-                const firstName = params.get('first_name');
-                const lastName = params.get('last_name');
-                const email = params.get('email');
+                const token = urlParams.get('access_token');
+    
+            if (token) {
+                // Store the token in localStorage
+                localStorage.setItem('authToken', token);
+                console.log("Access token stored in localStorage:", token);
+                
+                // Optionally, you can remove the query parameters from the URL so they don't remain visible:
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+                console.log("No access token found in URL.");
+            }
+                // const username = params.get('login');
+                // const firstName = params.get('first_name');
+                // const lastName = params.get('last_name');
+                // const email = params.get('email');
 
-                console.log('Received data from backend:');
-                console.log('login:', username || 'Not provided');
-                console.log('First Name:', firstName || 'Not provided');
-                console.log('Last Name:', lastName || 'Not provided');
-                console.log('Email:', email || 'Not provided');
+                // console.log('Received data from backend:');
+                // console.log('login:', username || 'Not provided');
+                // console.log('First Name:', firstName || 'Not provided');
+                // console.log('Last Name:', lastName || 'Not provided');
+                // console.log('Email:', email || 'Not provided');
             } catch (error) {
                 console.error('Error during 42 Network login:', error);
                 alert('An error occurred. Please try again.');
