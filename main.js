@@ -586,3 +586,55 @@ document.addEventListener("DOMContentLoaded", () => {
 //         }
 //     }
 // });
+function setupSignIn() {
+    const loginForm = document.getElementById('login-form');
+    const goToSignUp = document.getElementById('go-to-sign-up');
+    const errorMsg = document.querySelector('.error-msg');
+
+    goToSignUp.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigateTo('#/sign-up');
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.querySelector('input[placeholder="Username"]').value.trim();
+        const password = document.querySelector('input[placeholder="Password"]').value.trim();
+
+        // Clear any previous error message
+        errorMsg.style.display = 'none';
+        errorMsg.textContent = '';
+
+        if (!username || !password) {
+            errorMsg.style.display = 'block';
+            errorMsg.textContent = 'Username and password are required!';
+            return;
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Login successful:', data);
+                localStorage.setItem('authToken', data.access); // Store the token
+                navigateTo('#/dashboard'); // Navigate to the dashboard
+            } else {
+                const errorData = await response.json();
+                console.error('Login failed:', errorData);
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = errorData.error || 'Invalid username or password';
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            errorMsg.style.display = 'block';
+            errorMsg.textContent = 'Something went wrong. Please try again later.';
+        }
+    });
+}

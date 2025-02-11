@@ -804,12 +804,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="header">
                     <img class="logo" src="images/Pongify_logo.png">
                     <div class="test">
-                        <a href="#" data-page="home" class="active">HOME</a>
-                        <a href="#" data-page="profile">PROFILE</a>
-                        <a href="#" data-page="game">GAME</a>
-                        <a href="#" data-page="tournament">TOURNAMENT</a>
-                        <a href="#" data-page="chat">CHAT</a>
-                        <a href="#" data-page="settings">SETTINGS</a>
+                        <a href="#/dashboard" data-page="home" class="active">HOME</a>
+                        <a href="#/profile" data-page="profile">PROFILE</a>
+                        <a href="#/game" data-page="game">GAME</a>
+                        <a href="" data-page="tournament">TOURNAMENT</a>
+                        <a href="" data-page="chat">CHAT</a>
+                        <a href="" data-page="settings">SETTINGS</a>
                     </div>
                 </div>
                 <div class="middle">
@@ -863,11 +863,22 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         `,
         profile: `
-            <link rel="stylesheet" href="profile.css">
+            <div class="main">
+                <div class="header">
+                    <img class="logo" src="images/Pongify_logo.png">
+                    <div class="test">
+                        <a href="#/dashboard" data-page="home">HOME</a>
+                        <a href="#/profile" data-page="profile" class="active">PROFILE</a>
+                        <a href="#/game" data-page="game">GAME</a>
+                        <a href="" data-page="tournament">TOURNAMENT</a>
+                        <a href="#/chat" data-page="chat">CHAT</a>
+                        <a href="" data-page="settings">SETTINGS</a>
+                    </div>
+                </div>
             <div class="profile-container">
                 <div class="profile-info">
-                    <img class="profile-border" src="profile imgs/main_profile_window.png" alt="Profile Border">
-                    <img id="profile-img" class="profile-img" src="profile imgs/placeholder.png" alt="Profile Image">
+                    <img class="profile-border" src="profile imgs/main_profile_window.png">
+                    <img id="profile-img" class="profile-img" src="profile images/placeholder.png">
                     <h2 id="profile-username">Username</h2>
                 </div>
                 <div class="profile-stats">
@@ -879,7 +890,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             </div>
         `,
+        game: `
+            <div class="main">
+                <div class="header">
+                    <img class="logo" src="images/Pongify_logo.png">
+                    <div class="test">
+                        <a href="#/dashboard" data-page="home">HOME</a>
+                        <a href="#/profile" data-page="profile">PROFILE</a>
+                        <a href="#/game" data-page="game" class="active">GAME</a>
+                        <a href="" data-page="tournament">TOURNAMENT</a>
+                        <a href="#/chat" data-page="chat">CHAT</a>
+                        <a href="" data-page="settings">SETTINGS</a>
+                    </div>
+                </div>
+            </div>
+        `,
     };
+
+    function preloadStylesheet(url) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = url;
+        document.head.appendChild(link);
+    }
 
     function loadCSS(fileName) {
         const existingLink = document.getElementById('dynamic-css');
@@ -899,7 +932,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderPage(route) {
         const app = document.getElementById('app');
-        const contentArea = document.getElementById('content-area');
+        // const contentArea = document.getElementById('content-area');
 
         switch (route) {
             case '#/sign-in':
@@ -917,12 +950,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 loadCSS('dashboard.css');
                 break;
             case '#/home':
-                contentArea.innerHTML = pages.home;
+                app.innerHTML = pages.home;
                 break;
             case '#/profile':
-                contentArea.innerHTML = pages.profile;
+                app.innerHTML = pages.profile;
                 loadCSS('profile.css');
-                loadProfileInfo();
+                // loadProfileInfo();
+                break;
+            case '#/game':
+                app.innerHTML = pages.game;
+                loadCSS('game.css');
                 break;
             default:
                 app.innerHTML = pages.signIn;
@@ -947,18 +984,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const username = document.querySelector('input[placeholder="Username"]').value.trim();
             const password = document.querySelector('input[placeholder="Password"]').value.trim();
             const errorMsg = document.querySelector('.error-msg');
-
+            
             // Clear any previous error message
             errorMsg.style.display = 'none';
             errorMsg.textContent = '';
-
+            
             if (!username || !password) {
                 errorMsg.style.display = 'block';
                 errorMsg.textContent = 'Username and password are required!';
                 return;
             }
-
+            
             try {
+                console.log('Sending payload:', { username, password });
                 const response = await fetch('http://127.0.0.1:8000/login/', {
                     method: 'POST',
                     headers: {
@@ -967,11 +1005,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     body: JSON.stringify({ username, password }),
                 });
 
-                if (response.ok) {
+                if (response.ok) 
+                {
                     const data = await response.json();
                     localStorage.setItem('authToken', data.access);
                     navigateTo('#/dashboard');
-                } else {
+                    // renderPage('#/dashboard');
+                }
+                else 
+                {
                     const errorData = await response.json();
                     errorMsg.textContent = errorData.error || 'Invalid username or password';
                 }
@@ -982,8 +1024,47 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function setupSignUp() {
+
+
+    function setupSignUp() 
+    {
         const signupForm = document.getElementById('signup-form');
+        const btn2 = document.querySelector('.btn2');
+
+        if(btn2)
+        {
+            btn2.addEventListener('click', async () => {
+                try {
+                    // Redirect the user to the 42 login endpoint
+                    window.location.href = 'http://127.0.0.1:8000/42_login/';
+            
+                    // Check for the access token in the URL after redirect
+                    const params = new URLSearchParams(window.location.search);
+                    const token = params.get('access_token'); // URLSearchParams is used to parse query parameters
+            
+                    console.log("Access token from 42 Network:", token);
+                    if (token)
+                    {
+                        // Save token to localStorage
+                        localStorage.setItem('authToken', token);
+                        console.log("Access token stored in localStorage:", token);
+            
+                        // Optionally remove query parameters to clean the URL
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        // navigateTo('#/dashboard'); 
+
+                        //working here...
+                    }
+                    else 
+                    {
+                        console.log("No access token found in URL.");
+                    }
+                } catch (error) {
+                    console.error('Error during 42 Network login:', error);
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        }
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -1011,6 +1092,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert('An error occurred. Please try again.');
             }
         });
+        
     }
 
     async function loadProfileInfo() {
@@ -1036,10 +1118,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Load the initial page
+    preloadStylesheet('dashboard.css'); // Dashboard CSS
+    preloadStylesheet('profile.css'); // Profile page CSS
+    preloadStylesheet('game.css'); // Game page CSS (if applicable)
+
     window.addEventListener('popstate', () => {
         renderPage(window.location.hash);
     });
-
-    // Load the initial page
     renderPage(window.location.hash || '#/sign-in');
 });
