@@ -879,7 +879,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="profile-info">
                     <img class="profile-border" src="profile imgs/main_profile_window.png">
                     <img id="profile-img" class="profile-img" src="profile images/placeholder.png">
-                    <h2 id="profile-username">Username</h2>
+                    <h2 id="profile-username" class="profile-username">Username</h2>
                 </div>
                 <div class="profile-stats">
                     <img class="stats-border wins" src="profile imgs/level_and_wins_window.png" alt="Wins">
@@ -965,7 +965,7 @@ document.addEventListener("DOMContentLoaded", () => {
             case '#/profile':
                 app.innerHTML = pages.profile;
                 loadCSS('profile.css');
-                // loadProfileInfo();
+                loadProfileInfo();
                 break;
             case '#/game':
                 app.innerHTML = pages.game;
@@ -979,15 +979,40 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function setupSignIn() {
+    function setupSignIn() 
+    {
         const loginForm = document.getElementById('login-form');
         const goToSignUp = document.getElementById('go-to-sign-up');
         const errorMsg = document.querySelector('.error-msg');
+        const btn2 = document.querySelector('.btn2');
 
         goToSignUp.addEventListener('click', (e) => {
             e.preventDefault();
             navigateTo('#/sign-up');
         });
+
+
+        if (btn2) 
+        {
+            console.log(token);
+            btn2.addEventListener('click', async () => {
+                try {
+                    window.location.href = 'http://127.0.0.1:8000/42_login/';
+                    const params = new URLSearchParams(window.location.search);
+                    const token = params.get('access_token');
+                    if (token) {
+                        localStorage.setItem('authToken', token);
+                        console.log("Access token stored in localStorage:", token);
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    } else {
+                        console.log("No access token found in URL.");
+                    }
+                } catch (error) {
+                    console.error('Error during 42 Network login:', error);
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        }
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1107,18 +1132,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadProfileInfo() {
         try {
-            const token = localStorage.getItem('authToken');
+            // const token = localStorage.getItem('authToken');
             if (!token) return;
 
-            const response = await fetch('http://127.0.0.1:8000/profile/update/', {
+            const response = await fetch('http://127.0.0.1:8000/profile/', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             });
-
-            if (response.ok) {
+            
+            if (response.ok)
+            {
+                console.log(token);
                 const data = await response.json();
                 document.getElementById('profile-img').src = data.image?.link || 'default-avatar.png';
                 document.getElementById('profile-username').innerText = data.login || 'Unknown User';

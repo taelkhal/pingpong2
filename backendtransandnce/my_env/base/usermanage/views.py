@@ -2,12 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404, redirect
 from django.http import JsonResponse
-from rest_framework import status
+from rest_framework import status,generics
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated,AllowAny
-from .models import Profile,FriendRequest,Friendship
+from .models import Profile,FriendRequest
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import RegistrationSerializer, LoginSerializer, ProfileSerializer, UserSerializer, RegistrationSerializer_42
+from .serializers import RegistrationSerializer, LoginSerializer, ProfileSerializer, UserSerializer, RegistrationSerializer_42, FriendRequestSerializer, ProfileDetailSerializer
 import requests
 import json
 
@@ -67,7 +67,7 @@ class callback_42(APIView):
                 refresh = RefreshToken.for_user(user)
                 access_token = str(refresh.access_token)
             save_to_json(user_data)
-            # redirect_url = f"http://127.0.0.1:5500/dashboard.html&access_token={access_token}"
+            print("this is the token", access_token)
             redirect_url = f"http://127.0.0.1:5500/#dashboard?access_token={access_token}"
             return redirect(redirect_url)
         else:
@@ -136,42 +136,45 @@ class ProfileUpdateView(APIView):
 class SendFriendRequestView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, user_id):
+    def post(self, request, receiver_id):
         sender = request.user
-        receiver = get_object_or_404(User, id=user_id)
-
+        receiver = get_object_or_404(User, id=receiver_id)
+        
         if sender == receiver:
             return Response({"error": "You cannot send a friend request to yourself."}, status=status.HTTP_400_BAD_REQUEST)
-
-        friend_request, created = FriendRequest.objects.get_or_create(sender=sender, receiver=receiver)
-        if created:
-            return Response({"message": "Friend request sent successfully."}, status=status.HTTP_201_CREATED)
-        else:
+        
+        # Check for an existing request regardless of its status
+        if FriendRequest.objects.filter(sender=sender, receiver=receiver, status="pending").exists():
             return Response({"error": "Friend request already sent."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        friend_request = FriendRequest.objects.create(sender=sender, receiver=receiver)
+        return Response({"message": "Friend request sent successfully.", "friend_request_id": friend_request.id}, status=status.HTTP_201_CREATED)
     
 class AcceptFriendRequestView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, friend_request_id):
-        # print("Authenticated user:", request.user)
-        friend_request = get_object_or_404(         
-            FriendRequest,
-            # print("friendreq:", friend_request),
-            id=friend_request_id,
-            receiver=request.user,
-            accepted=False
-        )
-        friend_request.accepted = True
+    def post(self, request, request_id):
+        # Retrieve the friend request that is pending and ensure the logged-in user is the receiver
+        friend_request = get_object_or_404(FriendRequest, id=request_id, receiver=request.user, status="pending")
+        friend_request.status = "accepted"
         friend_request.save()
-
-        Friendship.objects.create(user1=friend_request.sender, user2=friend_request.receiver)
         return Response({"message": "Friend request accepted."}, status=status.HTTP_200_OK)
 
-# def get_friends(user):
-#     friendships1 = Friendship.objects.filter(user1=user)
-#     friendships2 = Friendship.objects.filter(user2=user)
-#     friends = [f.user2 for f in friendships1] + [f.user1 for f in friendships2]
-#     return friends
+class RejectFriendRequestView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, request_id):
+        friend_request = get_object_or_404(FriendRequest, id=request_id, receiver=request.user, status="pending")
+        friend_request.status = "rejected"
+        friend_request.save()
+        return Response({"message": "Friend request rejected."}, status=status.HTTP_200_OK)
+
+class PendingFriendRequestsView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FriendRequestSerializer
+
+    def get_queryset(self):
+        return FriendRequest.objects.filter(receiver=self.request.user, status="pending")
 
 class FriendsListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -192,8 +195,38 @@ class FriendsListView(APIView):
         
         serializer = UserSerializer(friends, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class FriendListView(APIView):
+    permission_classes = [IsAuthenticated]
 
-def user_list(request):
-    users = User.objects.all()
-    data = [{'id': user.id, 'username': user.username, 'email': user.email} for user in users]
-    return JsonResponse({'users': data}, status=200)
+    def get(self, request):
+        user = request.user
+
+        sent_requests = FriendRequest.objects.filter(sender=user, status="accepted")
+        received_requests = FriendRequest.objects.filter(receiver=user, status="accepted")
+        
+        friends = [fr.receiver for fr in sent_requests] + [fr.sender for fr in received_requests]
+        
+        friends = list(set(friends))
+        
+        serializer = UserSerializer(friends, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+# def user_list(request):
+#     print("here2")
+#     users = User.objects.all()
+#     data = [{'id': user.id, 'username': user.username, 'email': user.email} for user in users]
+#     return JsonResponse({'users': data}, status=200)
+
+class UserListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class ProfileDetailView(generics.RetrieveAPIView):
+    serializer_class = ProfileDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.profile
+    

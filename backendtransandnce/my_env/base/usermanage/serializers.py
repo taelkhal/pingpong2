@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Profile
+from .models import Profile,FriendRequest
+# from django.contrib.auth import get_user_model
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
@@ -39,6 +40,19 @@ class RegistrationSerializer_42(serializers.ModelSerializer):
         user.set_unusable_password()
         # user.save()
         return user
+
+class ProfileDetailSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField()
+    username = serializers.CharField(source='user.username', read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ['user', 'bio', 'username','email', 'first_name', 'last_name', 'avatar', 'created_at']
+
+    def get_avatar(self, obj):
+        if obj.avatar:
+            return obj.avatar.url
+        return obj.avatar_url
     
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', required=False)
@@ -82,8 +96,28 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid username or password")
         data['user'] = user
         return data
+
+class FriendRequestSerializer(serializers.ModelSerializer):
+    sender_username = serializers.CharField(source='sender.username', read_only=True)
+    sender_id = serializers.IntegerField(source='sender.id', read_only=True)
+    sender_avatar = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = FriendRequest
+        fields = ['id', 'sender_id', 'sender_username', 'sender_avatar','timestamp', 'status']
+    def get_sender_avatar(self, obj):
+        profile = obj.sender.profile
+        if profile.avatar:
+            return profile.avatar.url
+        return profile.avatar_url
     
 class UserSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'avatar']
+    def get_avatar(self, obj):
+        profile = obj.profile
+        if profile.avatar:
+            return profile.avatar.url
+        return profile.avatar_url

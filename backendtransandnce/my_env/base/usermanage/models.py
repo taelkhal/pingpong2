@@ -36,25 +36,31 @@ def save_user_profile(sender, instance, **kwargs):
     profile.save()
 
 class FriendRequest(models.Model):
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("accepted", "Accepted"),
+        ("rejected", "Rejected"),
+    )
+        
     sender = models.ForeignKey(User, related_name='sent_requests', on_delete=models.CASCADE)
     receiver = models.ForeignKey(User, related_name='received_requests', on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
-    accepted = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
 
     class Meta:
         unique_together = ('sender', 'receiver')
 
     def __str__(self):
-        return f"{self.sender.username} -> {self.receiver.username}"
+        return f"{self.sender.username} -> {self.receiver.username} ({self.status})"
 
-class Friendship(models.Model):
-    user1 = models.ForeignKey(User, related_name='friends1', on_delete=models.CASCADE)
-    user2 = models.ForeignKey(User, related_name='friends2', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+# class Friendship(models.Model):
+#     user1 = models.ForeignKey(User, related_name='friends1', on_delete=models.CASCADE)
+#     user2 = models.ForeignKey(User, related_name='friends2', on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ('user1', 'user2')
+#     class Meta:
+#         unique_together = ('user1', 'user2')
 
-    def __str__(self):
-        return f"{self.user1.username} <-> {self.user2.username}"
+#     def __str__(self):
+#         return f"{self.user1.username} <-> {self.user2.username}"
 
