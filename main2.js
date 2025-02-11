@@ -906,7 +906,17 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         `,
     };
+    
+    const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    const token = urlParams.get('access_token');
+    localStorage.setItem("authToken", token);
+    if (token){
 
+        navigateTo('#/dashboard');
+    }
+    
+                    // console.log(urlParams)
+                    console.log("Access token from 42 Network:", token);
     function preloadStylesheet(url) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
@@ -1039,10 +1049,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     window.location.href = 'http://127.0.0.1:8000/42_login/';
             
                     // Check for the access token in the URL after redirect
-                    const params = new URLSearchParams(window.location.search);
-                    const token = params.get('access_token'); // URLSearchParams is used to parse query parameters
-            
-                    console.log("Access token from 42 Network:", token);
+                    const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+                    const token = urlParams.get('access_token');
+                    // console.log(urlParams)
+                    console.log("Access token from 42 Network:", token); 
                     if (token)
                     {
                         // Save token to localStorage
